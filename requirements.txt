@@ -1,0 +1,27 @@
+# API polling (Weekend 1)
+requests
+nba_api
+
+# Backend
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy
+psycopg2-binary
+
+# Cache / dedup
+redis
+
+# Push notifications
+pywebpush
+
+# Validation
+pydantic[email]
+email-validator
+
+# Environment
+python-dotenv
+
+# Tests
+pytest

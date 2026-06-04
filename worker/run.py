@@ -4,6 +4,7 @@ import datetime
 from worker.mlb_client import get_live_game_ids, get_linescore
 from worker.nba_client import get_live_games, get_game_state
 from worker.rules import is_tense_mlb, is_tense_nba
+from worker import dispatcher
 
 NORMAL_INTERVAL = 60   # seconds between polls when nothing is tense
 TENSE_INTERVAL = 15    # seconds between polls when at least one game is tense
@@ -44,6 +45,7 @@ async def check_mlb(tense_games: set) -> bool:
         if tense and key not in tense_games:
             log(f"TENSE MLB {game_pk} | Inning: {inning_half} {inning} | Score: {score_str}")
             tense_games.add(key)
+            await asyncio.to_thread(dispatcher.notify, str(game_pk), "mlb", "tense_game", linescore)
         elif not tense and key in tense_games:
             log(f"CALM  MLB {game_pk} | Inning: {inning_half} {inning} | Score: {score_str}")
             tense_games.discard(key)
@@ -77,6 +79,7 @@ async def check_nba(tense_games: set) -> bool:
         if tense and key not in tense_games:
             log(f"TENSE NBA {game_id} | Q{state['period']} {clock} | {score_str}")
             tense_games.add(key)
+            await asyncio.to_thread(dispatcher.notify, game_id, "nba", "tense_game", state)
         elif not tense and key in tense_games:
             log(f"CALM  NBA {game_id} | Q{state['period']} {clock} | {score_str}")
             tense_games.discard(key)
